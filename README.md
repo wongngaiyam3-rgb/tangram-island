@@ -12,3 +12,11 @@
 此儲存庫只有靜態網頁和可公開的 Supabase publishable key，沒有管理金鑰或學生資料。資料存取以每位學生在該瀏覽器的隨機憑證及 RLS 隔離。班別和學號只用作紀錄標籤，並非身分驗證；跨裝置復原未提供。
 
 GitHub Pages：main 分支、根目錄。毋須建置。
+
+## 老師觀察站
+
+`teacher/` 是獨立的密碼登入入口，可按班別、學號篩選三班 75 位學生，查看 16 關完成狀態與最後同步時間，每 15 秒更新。不同裝置的同一學號按關卡合併完成狀態。
+
+密碼以 bcrypt 存在 Supabase 的私有 schema；GitHub 程式碼沒有老師密碼。`server/tangram-teacher.mjs` 是 Edge Function 原始碼，讀取環境中的服務金鑰；只在密碼驗證或一小時有效的簽署工作階段驗證通過後提供資料。工作階段只留在頁面記憶體，重新整理後需再次登入。登入有每個來源位址 15 分鐘最多 8 次的限制。回傳資料不包含學生裝置憑證或拼板座標。
+
+檢查：`node tests/teacher.test.mjs`。正式 API 檢查：`python tests/teacher-api.py`（以不回顯的提示輸入老師密碼）。
